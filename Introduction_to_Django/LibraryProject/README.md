@@ -14,3 +14,4 @@ This is a Django project created as part of the **Introduction to Django** proje
 ## Next Steps
 - Run the development server to verify the setup.
 - Explore the project structure (`settings.py`, `urls.py`, `manage.py`).
+
