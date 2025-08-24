@@ -1,3 +1,55 @@
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class CustomUser(AbstractUser):
+    bio = models.TextField(max_length=500, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    
+    # Many-to-many relationship for followers (users who follow this user)
+    followers = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        related_name='following_users',
+        blank=True
+    )
+    
+    # Many-to-many relationship for following (users that this user follows)
+    following = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        related_name='followers_users',
+        blank=True
+    )
+    
+    def __str__(self):
+        return self.username
+    
+    def followers_count(self):
+        return self.followers.count()
+    
+    def following_count(self):
+        return self.following.count()
+    
+    def is_following(self, user):
+        return self.following.filter(id=user.id).exists()
+    
+    def is_followed_by(self, user):
+        return self.followers.filter(id=user.id).exists()
+    
+    def follow(self, user):
+        if not self.is_following(user) and self != user:
+            self.following.add(user)
+            user.followers.add(self)
+            return True
+        return False
+    
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.following.remove(user)
+            user.followers.remove(self)
+            return True
+        return False
+
 # Create your models here.
 from django.db import models
 from django.conf import settings
@@ -37,4 +89,3 @@ class Comment(models.Model):
         return f"Comment by {self.author.username} on {self.post.title}"
     
 
-    
