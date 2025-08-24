@@ -1,12 +1,10 @@
 
-# Create your views here.
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.authtoken.models import Token
 from django.contrib.auth import login
-from django.shortcuts import render
 
 from .models import CustomUser
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
@@ -19,13 +17,12 @@ def register_user(request):
         if serializer.is_valid():
             user = serializer.save()
             
-            # Generate tokens
-            refresh = RefreshToken.for_user(user)
+            # Get the token for the new user
+            token, created = Token.objects.get_or_create(user=user)
             
             return Response({
                 'user': UserProfileSerializer(user).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'token': token.key,
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -36,14 +33,11 @@ def login_user(request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            
-            # Generate tokens
-            refresh = RefreshToken.for_user(user)
+            token = serializer.validated_data['token']
             
             return Response({
                 'user': UserProfileSerializer(user).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'token': token,
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -62,3 +56,6 @@ def user_profile(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    
