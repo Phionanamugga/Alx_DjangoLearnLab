@@ -45,5 +45,25 @@ curl -X POST http://localhost:8000/api/auth/register/ \
     "bio": "Test user bio"
   }'
 
+## Posts Endpoints
 
-  
+### List Posts
+- **URL**: `/api/posts/`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Query Parameters**:
+  - `search`: Search in title and content
+  - `ordering`: Order by fields (created_at, updated_at, likes_count)
+  - `page`: Page number for pagination
+
+### Create Post
+- **URL**: `/api/posts/`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Body**:
+  ```json
+  {
+    "title": "Post Title",
+    "content": "Post content"
+  }
+

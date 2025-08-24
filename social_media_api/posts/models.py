@@ -1,4 +1,3 @@
-# Create your models here.
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -36,5 +35,4 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.author.username} on {self.post.title}"
     
-
     
